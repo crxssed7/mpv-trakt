@@ -1,0 +1,3 @@
+MPV_SOCKET = "/tmp/mpv_socket"
+MPV_POLL_INTERVAL = 2
+TRAKT_CLIENT_ID = ""
