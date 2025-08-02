@@ -14,6 +14,9 @@ class PlaybackSession:
     def pause(self):
         self.playing = False
 
+    def resume(self):
+        self.playing = True
+
     def is_active(self):
         return self.active_item is not None
 

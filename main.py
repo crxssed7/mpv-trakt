@@ -1,7 +1,6 @@
 from mpv.instance import MPVInstance
 from trakt.client import TraktClient
 from ui.manager import UIManager
-from ui.session import SESSION
 from util import clean_file_name
 
 MPV = MPVInstance()
@@ -16,15 +15,23 @@ def handle_new_file(path):
         UIManager.show_trakt_popup(data, on_trakt_selection)
 
 def handle_play_pause(paused):
-    print("Paused" if paused else "Resumed")
+    if paused:
+        TRAKT.pause_scrobble()
+    else:
+        TRAKT.resume_scrobble()
+
+def handle_quit():
+    TRAKT.stop_scrobble()
 
 def on_trakt_selection(item):
-    SESSION.start(item)
-    print(f"Chosen {item}")
+    if item['type'] == 'movie':
+        TRAKT.start_scrobble(item)
 
 def main():
+    TRAKT.authenticate()
     MPV.on_file_change(handle_new_file)
     MPV.on_playback_change(handle_play_pause)
+    MPV.on_quit(handle_quit)
     import threading
     threading.Thread(target=MPV.run, daemon=True).start()
 

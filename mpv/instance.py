@@ -10,12 +10,16 @@ class MPVInstance:
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._file_cb = None
         self._playback_cb = None
+        self._quit_cb = None
 
     def on_file_change(self, callback):
         self._file_cb = callback
 
     def on_playback_change(self, callback):
         self._playback_cb = callback
+
+    def on_quit(self, callback):
+        self._quit_cb = callback
 
     def run(self):
         while True:
@@ -61,9 +65,11 @@ class MPVInstance:
                         elif name == "pause" and self._playback_cb:
                             self._playback_cb(data)
                     elif event.get("event") == "end-file":
-                        print("Playback finished:", event.get("reason"))
+                        if self._quit_cb:
+                            self._quit_cb()
                     elif event.get("event") == "shutdown":
-                        print("MPV is quitting")
+                        if self._quit_cb:
+                            self._quit_cb()
                 except Exception as e:
                     print(f"Error processing event: {e}")
 
